@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from 'ionic-angular';
 
-@Injectable({
-	providedIn: 'root'
-})
-
+@Injectable()
 export class AlertService {
 	constructor(private toastController: ToastController) { }
 	

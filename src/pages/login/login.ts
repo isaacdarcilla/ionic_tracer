@@ -1,15 +1,25 @@
-import {Component} from "@angular/core";
+import {Component, Injectable} from "@angular/core";
 import {NavController, AlertController, ToastController, MenuController} from "ionic-angular";
 import {HomePage} from "../home/home";
 import {RegisterPage} from "../register/register";
+import {AuthService} from "../../services/auth.service";
+import {AlertService} from "../../services/alert.service";
 
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html'
 })
+
+@Injectable()
 export class LoginPage {
 
-  constructor(public nav: NavController, public forgotCtrl: AlertController, public menu: MenuController, public toastCtrl: ToastController) {
+  constructor(
+    public nav: NavController, 
+    public forgotCtrl: AlertController, 
+    public menu: MenuController, 
+    public toastCtrl: ToastController,
+    public authService: AuthService,
+    public alertService: AlertService,) {
     this.menu.swipeEnable(false);
   }
 
@@ -23,40 +33,49 @@ export class LoginPage {
     this.nav.setRoot(HomePage);
   }
 
+  login(form: NgForm) {
+    this.authService.login(form.value.email, form.value.password).subscribe(
+      data => {
+        this.alertService.presentToast("Logged in");
+      },
+      error => {
+        console.log(error);
+      },
+      () => {
+        this.nav.setRoot(HomePage);
+      }
+    );
+  }
+
   forgotPass() {
     let forgot = this.forgotCtrl.create({
       title: 'Forgot Password?',
       message: "Enter you email address to send a reset link password.",
-      inputs: [
-        {
-          name: 'email',
-          placeholder: 'Email',
-          type: 'email'
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: data => {
-            console.log('Cancel clicked');
-          }
-        },
-        {
-          text: 'Send',
-          handler: data => {
-            console.log('Send clicked');
-            let toast = this.toastCtrl.create({
-              message: 'Email was sended successfully',
-              duration: 3000,
-              position: 'top',
-              cssClass: 'dark-trans',
-              closeButtonText: 'OK',
-              showCloseButton: true
-            });
-            toast.present();
-          }
+      inputs: [{
+        name: 'email',
+        placeholder: 'Email',
+        type: 'email'
+      }, ],
+      buttons: [{
+        text: 'Cancel',
+        handler: data => {
+          console.log('Cancel clicked');
         }
-      ]
+      }, {
+        text: 'Send',
+        handler: data => {
+          console.log('Send clicked');
+          let toast = this.toastCtrl.create({
+            message: 'Email was sended successfully',
+            duration: 3000,
+            position: 'top',
+            cssClass: 'dark-trans',
+            closeButtonText: 'OK',
+            showCloseButton: true
+          });
+          toast.present();
+        }
+      }]
     });
     forgot.present();
   }
